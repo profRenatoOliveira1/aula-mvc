@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { DatabaseModel } from './model/DatabaseModel';
+import { Pessoa } from './model/Pessoa';
 
 // definindo a porta do servidor
 const port: number = 3333;
@@ -16,6 +17,7 @@ server.get('/', (req, res) => {
 });
 
 server.get('/pessoas', (req, res) => {
+    Pessoa.listarPessoas();
     res.json({ mensagem: "Aqui será apresentado os dados das pessoas." });
 });
 

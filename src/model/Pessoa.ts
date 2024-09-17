@@ -1,4 +1,9 @@
-class Pessoa {
+import { DatabaseModel } from "./DatabaseModel";
+
+// Recupera o pool de conexões do banco de dados
+const database = new DatabaseModel().pool;
+
+export class Pessoa {
 
     private idPessoa: number = 0;
     private nome: string;
@@ -84,5 +89,45 @@ class Pessoa {
 
     public setPais(pais: string): void {
         this.pais = pais;
+    }
+
+    // MÉTODO PARA ACESSAR O BANCO DE DADOS
+    // CRUD Create - READ - Update - Delete
+    static async listarPessoas(): Promise<Array<Pessoa> | null> {
+        // Criando lista vazia para armazenar as pessoas
+        let listaDePessoas: Array<Pessoa> = [];
+
+        try {
+            // Query para consulta no banco de dados
+            const querySelectPessoa = `SELECT * FROM pessoa;`;
+
+            // executa a query no banco de dados
+            const respostaBD = await database.query(querySelectPessoa);
+
+            // percorre cada resultado retornado pelo banco de dados
+            // pessoa é o apelido que demos para cada linha retornada do banco de dados
+            respostaBD.rows.forEach((pessoa) => {
+                // criando objeto pessoa
+                let novaPessoa = new Pessoa(
+                    pessoa.nome,
+                    pessoa.sobrenome,
+                    pessoa.cpf,
+                    pessoa.email,
+                    pessoa.cidade,
+                    pessoa.pais
+                );
+                // adicionando o ID ao objeto
+                novaPessoa.setIdPessoa(pessoa.id);
+
+                // adicionando a pessoa na lista
+                listaDePessoas.push(novaPessoa);
+            });
+
+            // retornado a lista de pessoas para quem chamou a função
+            return listaDePessoas;
+        } catch (error) {
+            console.log(`Erro ao acessar o modelo: ${error}`);
+            return null;
+        }
     }
 }
